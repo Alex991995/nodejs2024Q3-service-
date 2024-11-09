@@ -41,8 +41,6 @@ export class UsersController {
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
     return this.usersService.updatePassword(id, updatePasswordDto);
-    // console.log(updatedUser)
-    // return res.status(HttpStatus.NO_CONTENT).send(updatedUser);
   }
 
   @Delete(':id')

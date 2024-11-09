@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { UpdatePasswordDto, User } from 'src/interface';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { Track, User, Artist, Album } from 'src/interface';
 
 @Injectable()
 export class DatabaseService {
   users: User[] = [];
+  tracks: Track[] = [];
+  artists: Artist[] = [];
+  albums: Album[] = [];
 
-  albums = [];
+  fav = {
+    users: this.users,
+  };
 }
+// npm run test -- test/tracks.e2e.spec.ts
