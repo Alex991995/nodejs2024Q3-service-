@@ -44,7 +44,7 @@ export class AlbumService {
       foundedAlbum = { ...foundedAlbum, ...updateAlbumDto };
       return foundedAlbum;
     }
-    throw new NotFoundException('Artist not found');
+    throw new NotFoundException('album not found');
   }
 
   remove(id: string) {
