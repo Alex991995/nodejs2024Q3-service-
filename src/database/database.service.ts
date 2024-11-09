@@ -1,15 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { Track, User, Artist, Album } from 'src/interface';
+import { Injectable, Scope } from '@nestjs/common';
+import { Track, User, Artist, Album, FavoritesResponse } from 'src/interface';
 
-@Injectable()
+@Injectable({ scope: Scope.DEFAULT })
 export class DatabaseService {
-  users: User[] = [];
+   users: User[] = [];
   tracks: Track[] = [];
-  artists: Artist[] = [];
   albums: Album[] = [];
+  artists: Artist[] = [];
 
-  fav = {
-    users: this.users,
+  fav: FavoritesResponse = {
+    artists: this.artists,
+    albums: this.albums,
+    tracks: this.tracks,
   };
+
+  getAlbums() {
+    return this.albums;
+  }
 }
 // npm run test -- test/tracks.e2e.spec.ts

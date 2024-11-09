@@ -51,6 +51,7 @@ export class AlbumService {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
+    // console.log(this.database.albums)
     const foundedAlbum = this.database.albums.find((album) => album.id === id);
 
     if (foundedAlbum) {
@@ -61,5 +62,14 @@ export class AlbumService {
     } else {
       throw new NotFoundException('User not found');
     }
+  }
+
+  removeFromAlbumArtistsId(id: string) {
+    console.log(this.database.albums);
+    this.database.albums.forEach((album) => {
+      console.log('album', album);
+      if (album.artistId === id) album.artistId === null;
+    });
+    // return this.database.albums;
   }
 }

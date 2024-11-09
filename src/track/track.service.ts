@@ -17,6 +17,7 @@ export class TrackService {
   create(createTrackDto: CreateTrackDto) {
     const newTrack = { ...createTrackDto, id: uuidv4() };
     this.database.tracks.push(newTrack);
+
     return newTrack;
   }
 
@@ -51,6 +52,7 @@ export class TrackService {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
+    // console.log(this.database.artists)
     const foundedTrack = this.database.tracks.find((track) => track.id === id);
 
     if (foundedTrack) {
