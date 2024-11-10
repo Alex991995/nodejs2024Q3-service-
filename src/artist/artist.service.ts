@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  forwardRef,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,10 +15,7 @@ import { AlbumService } from 'src/album/album.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(
-    private database: DatabaseService,
-    private albumService: AlbumService,
-  ) {}
+  constructor(private database: DatabaseService) {}
 
   create(createArtistDto: CreateArtistDto) {
     const newArtist = { ...createArtistDto, id: uuidv4() };
@@ -60,12 +59,13 @@ export class ArtistService {
     const foundedArtist = this.database.artists.find(
       (artist) => artist.id === id,
     );
-    console.log(this.database.getAlbums())
+    console.log('album', this.database.albums);
+    // console.log('album from artist', this.database.albums);
     if (foundedArtist) {
       this.database.artists = this.database.artists.filter(
         (artist) => artist.id !== foundedArtist.id,
       );
-      this.albumService.removeFromAlbumArtistsId(id);
+      // this.albumService.removeFromAlbumArtistsId(id);
       return HttpStatus.NO_CONTENT;
     } else {
       throw new NotFoundException('User not found');

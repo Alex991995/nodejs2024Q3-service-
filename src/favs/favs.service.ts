@@ -13,7 +13,7 @@ export class FavsService {
 
   getAllData() {
     console.log(this.database.users);
-    return this.database.fav;
+    // return this.database.fav;
   }
 
   addTrack(id: string) {
@@ -24,7 +24,7 @@ export class FavsService {
     const foundedTrack = this.database.tracks.find((track) => track.id === id);
 
     if (foundedTrack) {
-      this.database.fav.tracks.push(foundedTrack);
+      // this.database.fav.tracks.push(foundedTrack);
       return 'track was added to the favorite section';
     }
     throw new NotFoundException('track not found');

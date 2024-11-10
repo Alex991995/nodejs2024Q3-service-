@@ -51,7 +51,7 @@ export class AlbumService {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
-    // console.log(this.database.albums)
+    console.log('tracks from albums', this.database.tracks);
     const foundedAlbum = this.database.albums.find((album) => album.id === id);
 
     if (foundedAlbum) {
