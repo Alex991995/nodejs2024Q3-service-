@@ -17,7 +17,6 @@ export class TrackService {
   create(createTrackDto: CreateTrackDto) {
     const newTrack = { ...createTrackDto, id: uuidv4() };
     this.database.tracks.push(newTrack);
-
     return newTrack;
   }
 
