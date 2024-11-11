@@ -263,7 +263,6 @@ describe('Favorites (e2e)', () => {
       const {
         body: { id: trackId },
       } = createTrackResponse;
-
       const addTrackToFavoritesResponse = await unauthorizedRequest
         .post(favoritesRoutes.tracks(trackId))
         .set(commonHeaders);
