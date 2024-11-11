@@ -339,7 +339,6 @@ describe('artist (e2e)', () => {
       expect(searchAlbumResponse.statusCode).toBe(StatusCodes.OK);
 
       const { artistId: albumArtistId } = searchAlbumResponse.body;
-
       expect(albumArtistId).toBeNull();
     });
   });

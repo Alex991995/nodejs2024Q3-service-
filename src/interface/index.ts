@@ -8,24 +8,24 @@ export interface User {
 }
 
 export interface Track {
-  id: string; // uuid v4
+  id: string;
   name: string;
-  artistId: string | null; // refers to Artist
-  albumId: string | null; // refers to Album
-  duration: number; // integer number
+  artistId: string | null;
+  albumId: string | null;
+  duration: number;
 }
 
 export interface Artist {
-  id: string; // uuid v4
+  id: string;
   name: string;
   grammy: boolean;
 }
 
 export interface Album {
-  id: string; // uuid v4
+  id: string;
   name: string;
   year: number;
-  artistId: string | null; // refers to Artist
+  artistId: string | null;
 }
 
 export interface UpdatePasswordDto {
@@ -37,4 +37,10 @@ export interface FavoritesResponse {
   artists: Artist[];
   albums: Album[];
   tracks: Track[];
+}
+
+export interface Favorites {
+  artists: string[];
+  albums: string[];
+  tracks: string[];
 }

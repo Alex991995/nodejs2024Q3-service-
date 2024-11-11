@@ -1,5 +1,4 @@
-import { Injectable, OnModuleInit, Scope } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
 import { Track, User, Artist, Album, FavoritesResponse } from 'src/interface';
 
 @Injectable()
@@ -9,10 +8,9 @@ export class DatabaseService {
   albums: Album[] = [];
   artists: Artist[] = [];
 
-  fav: FavoritesResponse = {
-    artists: this.artists,
-    albums: this.albums,
-    tracks: this.tracks,
+  favorites: FavoritesResponse = {
+    artists: [],
+    albums: [],
+    tracks: [],
   };
 }
-// npm run test -- test/tracks.e2e.spec.ts

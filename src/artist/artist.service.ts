@@ -1,8 +1,6 @@
 import {
   BadRequestException,
-  forwardRef,
   HttpStatus,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,7 +9,6 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as uuidValidate } from 'uuid';
-import { AlbumService } from 'src/album/album.service';
 
 @Injectable()
 export class ArtistService {
@@ -56,45 +53,34 @@ export class ArtistService {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
+
     const foundedArtist = this.database.artists.find(
       (artist) => artist.id === id,
     );
-    console.log('album', this.database.albums);
-    // console.log('album from artist', this.database.albums);
+    this.database.favorites.artists = this.database.favorites.artists.filter(
+      (artist) => artist.id !== id,
+    );
+
     if (foundedArtist) {
+      this.database.albums.forEach((album) => {
+        if (album.artistId === foundedArtist.id) {
+          album.artistId = null;
+        }
+      });
+
+      this.database.tracks.forEach((track) => {
+        if (track.artistId === foundedArtist.id) {
+          track.artistId = null;
+        }
+      });
+
       this.database.artists = this.database.artists.filter(
         (artist) => artist.id !== foundedArtist.id,
       );
-      // this.albumService.removeFromAlbumArtistsId(id);
+
       return HttpStatus.NO_CONTENT;
     } else {
       throw new NotFoundException('User not found');
     }
   }
-
-  //   if (!validate(id)) throw new HttpException('Invalid id', HttpStatus.BAD_REQUEST);
-  //   if (!this.database.artist.has(id)) throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
-
-  //   const artist = this.database.artist.get(id);
-
-  //   Array.from(this.database.album.values()).forEach((album) => {
-  //     if (album.artistId === artist.id) {
-  //       album.artistId = null;
-  //     }
-  //   });
-
-  //   Array.from(this.database.track.values()).forEach((track) => {
-  //     if (track.artistId === artist.id) {
-  //       track.artistId = null;
-  //     }
-  //   });
-
-  //   const favIndex = this.database.favorites.artists.indexOf(id);
-  //   if (favIndex > -1) {
-  //     this.database.favorites.artists.splice(favIndex, 1);
-  //   }
-
-  //   this.database.artist.delete(artist.id);
-  //   return null;
-  // }
 }

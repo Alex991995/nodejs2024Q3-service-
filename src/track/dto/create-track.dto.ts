@@ -9,10 +9,12 @@ export class CreateTrackDto {
   @IsString()
   artistId: string | null;
 
+  @IsNotEmpty()
   @IsOptional()
   @IsString()
   albumId: string | null;
 
+  @IsNotEmpty()
   @IsNumber()
   @IsNotEmpty()
   duration: number;

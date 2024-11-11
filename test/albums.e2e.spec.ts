@@ -311,13 +311,11 @@ describe('Album (e2e)', () => {
         .delete(albumsRoutes.delete(id))
         .set(commonHeaders);
       expect(deleteResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
-
       const searchTrackResponse = await unauthorizedRequest
         .get(tracksRoutes.getById(trackId))
         .set(commonHeaders);
 
       expect(searchTrackResponse.statusCode).toBe(StatusCodes.OK);
-
       const { albumId } = searchTrackResponse.body;
       expect(albumId).toBe(null);
     });

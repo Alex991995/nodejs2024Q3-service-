@@ -51,8 +51,11 @@ export class TrackService {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
-    // console.log(this.database.artists)
     const foundedTrack = this.database.tracks.find((track) => track.id === id);
+
+    this.database.favorites.tracks = this.database.favorites.tracks.filter(
+      (track) => track.id !== id,
+    );
 
     if (foundedTrack) {
       this.database.tracks = this.database.tracks.filter(
@@ -62,5 +65,13 @@ export class TrackService {
     } else {
       throw new NotFoundException('Track not found');
     }
+  }
+
+  setNull(id: string) {
+    this.database.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
   }
 }

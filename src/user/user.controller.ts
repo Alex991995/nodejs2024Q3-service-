@@ -6,14 +6,12 @@ import {
   Put,
   Param,
   Delete,
-  HttpCode,
   Res,
-  Req,
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto, UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-user.dto';
 import { Response } from 'express';
 
 @Controller('user')

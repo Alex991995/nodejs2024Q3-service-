@@ -9,10 +9,14 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as uuidValidate } from 'uuid';
+import { TrackService } from 'src/track/track.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(private database: DatabaseService) {}
+  constructor(
+    private database: DatabaseService,
+    private trackService: TrackService,
+  ) {}
 
   create(createAlbumDto: CreateAlbumDto) {
     const newAlbum = { ...createAlbumDto, id: uuidv4() };
@@ -51,25 +55,26 @@ export class AlbumService {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
-    console.log('tracks from albums', this.database.tracks);
     const foundedAlbum = this.database.albums.find((album) => album.id === id);
+
+    this.database.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
+
+    this.database.favorites.albums = this.database.favorites.albums.filter(
+      (album) => album.id !== id,
+    );
 
     if (foundedAlbum) {
       this.database.albums = this.database.albums.filter(
         (album) => album.id !== foundedAlbum.id,
       );
+
       return HttpStatus.NO_CONTENT;
     } else {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('album not found');
     }
-  }
-
-  removeFromAlbumArtistsId(id: string) {
-    console.log(this.database.albums);
-    this.database.albums.forEach((album) => {
-      console.log('album', album);
-      if (album.artistId === id) album.artistId === null;
-    });
-    // return this.database.albums;
   }
 }
