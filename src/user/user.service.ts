@@ -16,9 +16,15 @@ import { Prisma } from '@prisma/client';
 export class UserService {
   constructor(private database: DatabaseService) {}
 
-  async create(createUserDto: Prisma.UserCreateInput) {
+  async create(createUserDto: CreateUserDto) {
+    const now = Math.floor(Date.now() / 1000);
+    const dateTimeToIntUser = {
+      ...createUserDto,
+      createdAt: now,
+      updatedAt: now,
+    };
     const newUser = await this.database.user.create({
-      data: createUserDto,
+      data: dateTimeToIntUser,
     });
     const { password, ...newUserWithoutPassword } = newUser;
     return newUserWithoutPassword;
@@ -28,50 +34,78 @@ export class UserService {
     return this.database.user.findMany();
   }
 
-  // findOne(id: string) {
-  //   if (!uuidValidate(id)) {
-  //     throw new BadRequestException('invalid id');
-  //   } else if (this.database.users.some((user) => user.id === id)) {
-  //     return HttpStatus.OK;
-  //   }
+  async findOne(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+    const user = await this.database.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
-  //   throw new NotFoundException('User not found');
-  // }
+    if (user) {
+      return user;
+    }
 
-  // updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
-  //   const { newPassword, oldPassword } = updatePasswordDto;
+    throw new NotFoundException('User not found');
+  }
 
-  //   const user = this.database.users.find((user) => user.id === id);
-  //   if (!uuidValidate(id)) {
-  //     throw new BadRequestException('invalid id');
-  //   } else if (user) {
-  //     if (user.password === oldPassword) {
-  //       user.password = newPassword;
-  //       user.version += 1;
-  //       user.updatedAt = Date.now();
-  //       const { password, ...userWithoutPassword } = user;
-  //       return userWithoutPassword;
-  //     } else {
-  //       throw new ForbiddenException('Access denied');
-  //     }
-  //   }
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const now = Math.floor(Date.now() / 1000);
+    const { newPassword, oldPassword } = updatePasswordDto;
 
-  //   throw new NotFoundException('User not found');
-  // }
+    const fondedUser = await this.database.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
-  // remove(id: string) {
-  //   if (!uuidValidate(id)) {
-  //     throw new BadRequestException('invalid id');
-  //   }
-  //   const foundedUser = this.database.users.find((user) => user.id === id);
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    } else if (fondedUser) {
+      if (fondedUser.password === oldPassword) {
+        const user = await this.database.user.update({
+          where: {
+            id,
+          },
+          data: {
+            ...fondedUser,
+            password: newPassword,
+            version: fondedUser.version + 1,
+            updatedAt: now + 1,
+          },
+        });
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      } else {
+        throw new ForbiddenException('Access denied');
+      }
+    }
 
-  //   if (foundedUser) {
-  //     this.database.users = this.database.users.filter(
-  //       (user) => user.id !== foundedUser.id,
-  //     );
-  //     return HttpStatus.NO_CONTENT;
-  //   } else {
-  //     throw new NotFoundException('User not found');
-  //   }
-  // }
+    throw new NotFoundException('User not found');
+  }
+
+  async remove(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+
+    const user = await this.database.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (user) {
+      await this.database.user.delete({
+        where: {
+          id,
+        },
+      });
+      return HttpStatus.NO_CONTENT;
+    } else {
+      throw new NotFoundException('User not found');
+    }
+  }
 }
