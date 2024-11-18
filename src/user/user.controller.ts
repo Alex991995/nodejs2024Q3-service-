@@ -13,7 +13,6 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { Response } from 'express';
-import { Prisma } from '@prisma/client';
 
 @Controller('user')
 export class UsersController {

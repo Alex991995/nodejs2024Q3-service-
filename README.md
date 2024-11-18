@@ -8,13 +8,28 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone git@github.com:Alex991995/nodejs2024Q3-service-.git
 ```
 
 ## Installing NPM modules
 
 ```
 npm install
+```
+
+## Running application
+```
+npm run docker:up
+```
+
+## Close application
+```
+npm run docker:down
+```
+
+## Check for vulnerabilities
+```
+npm run docker:scout
 ```
 
 ## Running application

@@ -1,77 +1,78 @@
-// import {
-//   BadRequestException,
-//   HttpStatus,
-//   Injectable,
-//   NotFoundException,
-// } from '@nestjs/common';
-// import { CreateTrackDto } from './dto/create-track.dto';
-// import { UpdateTrackDto } from './dto/update-track.dto';
-// import { DatabaseService } from 'src/database/database.service';
-// import { v4 as uuidv4 } from 'uuid';
-// import { validate as uuidValidate } from 'uuid';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateTrackDto } from './dto/create-track.dto';
+import { UpdateTrackDto } from './dto/update-track.dto';
+import { DatabaseService } from 'src/database/database.service';
+import { v4 as uuidv4 } from 'uuid';
+import { validate as uuidValidate } from 'uuid';
 
-// @Injectable()
-// export class TrackService {
-//   constructor(private database: DatabaseService) {}
+@Injectable()
+export class TrackService {
+  constructor(private database: DatabaseService) {}
 
-//   create(createTrackDto: CreateTrackDto) {
-//     const newTrack = { ...createTrackDto, id: uuidv4() };
-//     this.database.tracks.push(newTrack);
-//     return newTrack;
-//   }
+  async create(createTrackDto: CreateTrackDto) {
+    const newTrack = { ...createTrackDto, id: uuidv4() };
 
-//   findAll() {
-//     return this.database.tracks;
-//   }
+    await this.database.track.create({
+      data: newTrack,
+    });
+    return newTrack;
+  }
 
-//   findOne(id: string) {
-//     if (!uuidValidate(id)) {
-//       throw new BadRequestException('invalid id');
-//     } else if (this.database.tracks.some((track) => track.id === id)) {
-//       return HttpStatus.OK;
-//     }
+  findAll() {
+    return this.database.track.findMany();
+  }
 
-//     throw new NotFoundException('artist not found');
-//   }
+  async findOne(id: string) {
+    const uniqueTrack = await this.database.track.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    } else if (uniqueTrack) {
+      return HttpStatus.OK;
+    }
 
-//   update(id: string, updateTrackDto: UpdateTrackDto) {
-//     if (!uuidValidate(id)) {
-//       throw new BadRequestException('invalid id');
-//     }
+    throw new NotFoundException('Track not found');
+  }
 
-//     let foundedTrack = this.database.tracks.find((track) => track.id === id);
-//     if (foundedTrack) {
-//       foundedTrack = { ...foundedTrack, ...updateTrackDto };
-//       return foundedTrack;
-//     }
-//     throw new NotFoundException('track not found');
-//   }
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
 
-//   remove(id: string) {
-//     if (!uuidValidate(id)) {
-//       throw new BadRequestException('invalid id');
-//     }
-//     const foundedTrack = this.database.tracks.find((track) => track.id === id);
+    try {
+      const foundedTrack = await this.database.track.update({
+        where: {
+          id,
+        },
+        data: updateTrackDto,
+      });
+      return foundedTrack;
+    } catch {
+      throw new NotFoundException('album not found');
+    }
+  }
 
-//     this.database.favorites.tracks = this.database.favorites.tracks.filter(
-//       (track) => track.id !== id,
-//     );
-
-//     if (foundedTrack) {
-//       this.database.tracks = this.database.tracks.filter(
-//         (track) => track.id !== foundedTrack.id,
-//       );
-//       return HttpStatus.NO_CONTENT;
-//     } else {
-//       throw new NotFoundException('Track not found');
-//     }
-//   }
-
-//   setNull(id: string) {
-//     this.database.tracks.forEach((track) => {
-//       if (track.albumId === id) {
-//         track.albumId = null;
-//       }
-//     });
-//   }
-// }
+  async remove(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+    try {
+      await this.database.track.delete({
+        where: {
+          id,
+        },
+      });
+      return HttpStatus.NO_CONTENT;
+    } catch {
+      throw new NotFoundException('Track not found');
+    }
+  }
+}

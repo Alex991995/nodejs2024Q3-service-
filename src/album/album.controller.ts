@@ -39,8 +39,8 @@ export class AlbumController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Res() res: Response) {
-    const result = this.albumService.remove(id);
+  async remove(@Param('id') id: string, @Res() res: Response) {
+    const result = await this.albumService.remove(id);
     if (result === 204) {
       return res.status(HttpStatus.NO_CONTENT).send();
     }

@@ -9,68 +9,87 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as uuidValidate } from 'uuid';
-import { TrackService } from 'src/track/track.service';
+// import { TrackService } from 'src/track/track.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(
-    private database: DatabaseService,
-    private trackService: TrackService,
-  ) {}
+  constructor(private database: DatabaseService) {}
 
-  create(createAlbumDto: CreateAlbumDto) {
+  async create(createAlbumDto: CreateAlbumDto) {
     const newAlbum = { ...createAlbumDto, id: uuidv4() };
-    this.database.albums.push(newAlbum);
+    await this.database.album.create({
+      data: newAlbum,
+    });
     return newAlbum;
   }
 
   findAll() {
-    return this.database.albums;
+    return this.database.album.findMany();
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
+    const uniqueAlbum = await this.database.album.findUnique({
+      where: {
+        id,
+      },
+    });
+
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
-    } else if (this.database.albums.some((album) => album.id === id)) {
+    } else if (uniqueAlbum) {
       return HttpStatus.OK;
     }
 
     throw new NotFoundException('artist not found');
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
 
-    let foundedAlbum = this.database.albums.find((album) => album.id === id);
-    if (foundedAlbum) {
-      foundedAlbum = { ...foundedAlbum, ...updateAlbumDto };
+    try {
+      const foundedAlbum = await this.database.album.update({
+        where: {
+          id,
+        },
+        data: updateAlbumDto,
+      });
       return foundedAlbum;
+    } catch {
+      throw new NotFoundException('album not found');
     }
-    throw new NotFoundException('album not found');
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     if (!uuidValidate(id)) {
       throw new BadRequestException('invalid id');
     }
-    const foundedAlbum = this.database.albums.find((album) => album.id === id);
-
-    this.database.tracks.forEach((track) => {
-      if (track.albumId === id) {
-        track.albumId = null;
-      }
+    const foundedAlbum = await this.database.album.findUnique({
+      where: {
+        id,
+      },
     });
 
-    this.database.favorites.albums = this.database.favorites.albums.filter(
-      (album) => album.id !== id,
-    );
+    await this.database.track.updateMany({
+      where: {
+        artistId: id,
+      },
+      data: {
+        artistId: null,
+      },
+    });
+
+    // this.database.favorites.albums = this.database.favorites.albums.filter(
+    //   (album) => album.id !== id,
+    // );
 
     if (foundedAlbum) {
-      this.database.albums = this.database.albums.filter(
-        (album) => album.id !== foundedAlbum.id,
-      );
+      await this.database.album.delete({
+        where: {
+          id,
+        },
+      });
 
       return HttpStatus.NO_CONTENT;
     } else {

@@ -71,49 +71,23 @@ export class ArtistService {
       },
     });
 
-    // this.database.favorites.artists = this.database.favorites.artists.filter(
-    //   (artist) => artist.id !== id,
-    // );
-
-    await this.database.album.updateMany({
-      where: {
-        artistId: id,
-      },
-      data: {
-        artistId: null,
-      },
-    });
-
-    await this.database.track.updateMany({
-      where: {
-        artistId: id,
-      },
-      data: {
-        artistId: null,
-      },
-    });
-
     if (foundedArtist) {
-      // this.database.albums.forEach((album) => {
-      //   if (album.artistId === foundedArtist.id) {
-      //     album.artistId = null;
-      //   }
-      // });
-      // await this.database.album.update({
-      //   where: {
-      //     artistId: id,
-      //   },
-      //   data: {
-      //     artistId: null,
-      //   },
-      // });
-
-      // this.database.tracks.forEach((track) => {
-      //   if (track.artistId === foundedArtist.id) {
-      //     track.artistId = null;
-      //   }
-      // });
-
+      await this.database.album.updateMany({
+        where: {
+          artistId: id,
+        },
+        data: {
+          artistId: null,
+        },
+      });
+      await this.database.track.updateMany({
+        where: {
+          artistId: id,
+        },
+        data: {
+          artistId: null,
+        },
+      });
       await this.database.artist.delete({
         where: {
           id,

@@ -1,20 +1,20 @@
-version: '3'
-
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  home-library:
+    image: alexwoods/home-library
     ports:
       - ${PORT}:${PORT}
     depends_on:
       - db
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${PORT_DB}/${POSTGRES_DB}?schema=public"
+      DATABASE_URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${PORT_DB}/${POSTGRES_DB}?schema=public'
     networks:
       - app-network
     restart: always
-
+    volumes:
+      - type: bind
+        source: ./src
+        target: /usr/src/app/src
+      - ./logs:/usr/src/app/logs
   db:
     container_name: db
     build: ./databaseDocker/
@@ -36,3 +36,6 @@ volumes:
 networks:
   app-network:
     name: app-network
+
+    # image: alexwoods/home-library
+  # container_name: home-library

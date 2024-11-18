@@ -1,85 +1,228 @@
-// import {
-//   BadRequestException,
-//   HttpException,
-//   HttpStatus,
-//   Injectable,
-// } from '@nestjs/common';
-// import { DatabaseService } from 'src/database/database.service';
-// import { validate as uuidValidate } from 'uuid';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
+import { DatabaseService } from 'src/database/database.service';
+import { validate as uuidValidate } from 'uuid';
 
-// @Injectable()
-// export class FavsService {
-//   constructor(private database: DatabaseService) {}
+@Injectable()
+export class FavsService {
+  constructor(private database: DatabaseService) {}
 
-//   getAllData() {
-//     return this.database.favorites;
-//   }
+  async getAllData() {
+    const artists = await this.database.artist.findMany({
+      where: { isFavorite: true },
+      select: { id: true, name: true, grammy: true },
+    });
+    const albums = await this.database.album.findMany({
+      where: { isFavorite: true },
+      select: { id: true, name: true, year: true, artistId: true },
+    });
+    const tracks = await this.database.track.findMany({
+      where: { isFavorite: true },
+      select: {
+        id: true,
+        name: true,
+        artistId: true,
+        albumId: true,
+        duration: true,
+      },
+    });
 
-//   createAlbum(id: string) {
-//     if (!uuidValidate(id)) {
-//       throw new BadRequestException('invalid id');
-//     }
-//     const foundAlbum = this.database.albums.find((album) => album.id === id);
-//     if (foundAlbum) {
-//       this.database.favorites.albums.push(foundAlbum);
-//       return;
-//     } else {
-//       throw new HttpException(
-//         `Invalid album `,
-//         HttpStatus.UNPROCESSABLE_ENTITY,
-//       );
-//     }
-//   }
+    return { artists, albums, tracks };
+  }
 
-//   createArtist(id: string) {
-//     if (!uuidValidate(id)) {
-//       throw new BadRequestException('invalid id');
-//     }
-//     const foundArtist = this.database.artists.find(
-//       (artist) => artist.id === id,
-//     );
-//     if (foundArtist) {
-//       this.database.favorites.artists.push(foundArtist);
-//       return;
-//     } else {
-//       throw new HttpException(
-//         `Invalid Artist `,
-//         HttpStatus.UNPROCESSABLE_ENTITY,
-//       );
-//     }
-//   }
+  async createArtist(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
 
-//   createTrack(id: string) {
-//     if (!uuidValidate(id)) {
-//       throw new BadRequestException('invalid id');
-//     }
-//     const foundedTrack = this.database.tracks.find((track) => track.id === id);
-//     if (foundedTrack) {
-//       this.database.favorites.tracks.push(foundedTrack);
-//       return;
-//     } else {
-//       throw new HttpException(
-//         `Invalid track `,
-//         HttpStatus.UNPROCESSABLE_ENTITY,
-//       );
-//     }
-//   }
+    const findArtist = await this.database.artist.findUnique({
+      where: {
+        id,
+      },
+    });
 
-//   deleteTrack(id: string) {
-//     this.database.favorites.tracks = this.database.favorites.tracks.filter(
-//       (track) => track.id !== id,
-//     );
-//   }
+    if (!findArtist) {
+      throw new HttpException(
+        `Invalid track `,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
 
-//   deleteAlbum(id: string) {
-//     this.database.favorites.albums = this.database.favorites.albums.filter(
-//       (album) => album.id !== id,
-//     );
-//   }
+    const updateArtist = await this.database.artist.update({
+      where: {
+        id,
+      },
+      data: {
+        isFavorite: true,
+      },
+    });
+    return updateArtist;
+  }
 
-//   deleteArtist(id: string) {
-//     this.database.favorites.artists = this.database.favorites.artists.filter(
-//       (artist) => artist.id !== id,
-//     );
-//   }
-// }
+  async deleteArtist(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+
+    const findArtist = await this.database.artist.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!findArtist) {
+      throw new HttpException(
+        `Invalid artist `,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const updateArtist = await this.database.artist.update({
+      where: {
+        id,
+      },
+      data: {
+        isFavorite: false,
+      },
+    });
+    return updateArtist;
+  }
+
+  async createTrack(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+
+    const findTrack = await this.database.track.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!findTrack) {
+      throw new HttpException(
+        `Invalid track `,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const updateTrack = await this.database.track.update({
+      where: {
+        id,
+      },
+      data: {
+        isFavorite: true,
+      },
+    });
+    return updateTrack;
+  }
+
+  async deleteTrack(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+
+    const findTrack = await this.database.track.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!findTrack) {
+      throw new HttpException(
+        `Invalid track `,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const updateTrack = await this.database.track.update({
+      where: {
+        id,
+      },
+      data: {
+        isFavorite: false,
+      },
+    });
+    return updateTrack;
+  }
+
+  async createAlbum(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+
+    const findAlbum = await this.database.album.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!findAlbum) {
+      throw new HttpException(
+        `Invalid track `,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const updateAlbum = await this.database.album.update({
+      where: {
+        id,
+      },
+      data: {
+        isFavorite: true,
+      },
+    });
+    return updateAlbum;
+  }
+
+  async deleteAlbum(id: string) {
+    if (!uuidValidate(id)) {
+      throw new BadRequestException('invalid id');
+    }
+
+    const findAlbum = await this.database.album.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!findAlbum) {
+      throw new HttpException(
+        `Invalid track `,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const updateAlbum = await this.database.album.update({
+      where: {
+        id,
+      },
+      data: {
+        isFavorite: false,
+      },
+    });
+    return updateAlbum;
+  }
+
+  // deleteTrack(id: string) {
+  //   this.database.favorites.tracks = this.database.favorites.tracks.filter(
+  //     (track) => track.id !== id,
+  //   );
+  // }
+
+  // deleteAlbum(id: string) {
+  //   this.database.favorites.albums = this.database.favorites.albums.filter(
+  //     (album) => album.id !== id,
+  //   );
+  // }
+
+  // deleteArtist(id: string) {
+  //   this.database.favorites.artists = this.database.favorites.artists.filter(
+  //     (artist) => artist.id !== id,
+  //   );
+  // }
+}

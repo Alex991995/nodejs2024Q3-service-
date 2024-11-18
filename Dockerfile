@@ -1,16 +1,18 @@
-FROM node:20
+FROM --platform=linux/amd64 node:22-alpine3.18
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
 
-RUN npm install
+RUN npm ci  && npm cache clean --force
 
 COPY prisma ./prisma
 
 RUN npx prisma generate 
 
 COPY . .
+
+RUN mkdir -p /usr/src/app/logs
 
 EXPOSE 4000
 

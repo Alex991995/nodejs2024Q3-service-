@@ -14,41 +14,45 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  login     String     
+  id        String @id @default(uuid())
+  login     String
   password  String
-  version   Int        @default(1) 
-   createdAt Int        @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint")) 
-  updatedAt Int        @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))  
-  Favorites Favorites?
+  version   Int    @default(1)
+  createdAt Int    @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))
+  updatedAt Int    @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))
 }
 
 model Artist {
-  id     String  @id @default(uuid())
-  name   String
-  grammy Boolean
-}
-
-model Track {
-  id       String  @id @default(uuid())
-  name     String
-  artistId String?
-  albumId  String?
-  duration Int
+  id         String   @id @default(uuid())
+  name       String   
+  grammy     Boolean
+  
+  albums     Album[]
+  tracks     Track[]
+  isFavorite Boolean @default(false)
 }
 
 model Album {
-  id       String  @id @default(uuid())
-  name     String
-  year     Int
-  artistId String?
+  id        String   @id @default(uuid())
+  name      String
+  year      Int
+
+  artist    Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId  String?
+
+  tracks    Track[]
+  isFavorite Boolean @default(false)  
 }
 
-model Favorites {
-  userId  String   @unique @map("user_id")
-  artists String[] 
-  albums  String[] 
-  tracks  String[] 
+model Track {
+  id        String   @id @default(uuid())
+  name      String
+  duration  Int
 
-  user User @relation(fields: [userId], references: [id])
+  artist    Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId  String?
+  album     Album?   @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  albumId   String?
+  
+  isFavorite Boolean @default(false) 
 }
