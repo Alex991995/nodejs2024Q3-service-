@@ -10,6 +10,9 @@ import { FavsModule } from './favs/favs.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from './logger/logger.module';
 import { RequestLoggerMiddleware } from 'src/middleware/logger.middleware';
+import { AuthModule } from './auth/auth.module';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -23,9 +26,16 @@ import { RequestLoggerMiddleware } from 'src/middleware/logger.middleware';
       isGlobal: true,
     }),
     LoggerModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

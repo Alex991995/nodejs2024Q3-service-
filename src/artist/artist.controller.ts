@@ -24,38 +24,56 @@ export class ArtistController {
   @Post()
   async create(@Body() createArtistDto: CreateArtistDto) {
     try {
-      const res = await this.artistService.create(createArtistDto);
-      return res;
+      return this.artistService.create(createArtistDto);
     } catch (error) {
-      if (error instanceof Error) {
-        this.logger.error(JSON.stringify(createArtistDto), error.stack);
-      }
+      this.logger.error(JSON.stringify(createArtistDto), error.stack);
+      throw error;
+      // if (error instanceof Error) {
+      //   this.logger.error(JSON.stringify(createArtistDto), error.stack);
+      // }
     }
-    // const res = await this.artistService.create(createArtistDto);
-    // this.logger.log(JSON.stringify(createArtistDto));
-    // return res;
   }
 
   @Get()
   findAll() {
-    return this.artistService.findAll();
+    try {
+      return this.artistService.findAll();
+    } catch (error) {
+      this.logger.error(JSON.stringify(error.message), error.stack);
+      throw error;
+    }
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.artistService.findOne(id);
+    try {
+      return this.artistService.findOne(id);
+    } catch (error) {
+      this.logger.error(JSON.stringify(error.message), error.stack);
+      throw error;
+    }
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    return this.artistService.update(id, updateArtistDto);
+    try {
+      return this.artistService.update(id, updateArtistDto);
+    } catch (error) {
+      this.logger.error(JSON.stringify(updateArtistDto), error.stack);
+      throw error;
+    }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string, @Res() res: Response) {
-    const result = await this.artistService.remove(id);
-    if (result === 204) {
-      return res.status(HttpStatus.NO_CONTENT).send();
+    try {
+      const result = await this.artistService.remove(id);
+      if (result === 204) {
+        return res.status(HttpStatus.NO_CONTENT).send();
+      }
+    } catch (error) {
+      this.logger.error(JSON.stringify(error.message), error.stack);
+      throw error;
     }
   }
 }

@@ -17,6 +17,8 @@ services:
       - ./logs:/usr/src/app/logs
     command: >
       sh -c "mkdir -p /usr/src/app/logs && npm run start:dev"
+    env_file:
+      - .env
   db:
     container_name: db
     build: ./databaseDocker/

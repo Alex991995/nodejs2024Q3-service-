@@ -9,7 +9,6 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as uuidValidate } from 'uuid';
-// import { TrackService } from 'src/track/track.service';
 
 @Injectable()
 export class AlbumService {

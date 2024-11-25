@@ -14,8 +14,9 @@ async function bootstrap() {
   const configService: ConfigService = app.get(ConfigService);
   const PORT = parseInt(configService.get('PORT')) || 4000;
   const httpAdapterHost = app.get(HttpAdapterHost);
+  const logger = app.get(LoggerService);
 
-  app.useLogger(app.get(LoggerService));
+  app.useLogger(logger);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost));
 
@@ -29,6 +30,14 @@ async function bootstrap() {
   SwaggerModule.setup('doc', app, documentFactory);
 
   console.log('Listening on port', PORT);
+
+  process.on('uncaughtException', (err) => {
+    logger.error(`[uncaughtException] ${err.message}`);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    logger.error(`[unhandledRejection] ${reason}`);
+  });
   await app.listen(PORT);
 }
 bootstrap();

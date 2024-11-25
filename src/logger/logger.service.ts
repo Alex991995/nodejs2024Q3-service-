@@ -28,7 +28,7 @@ export class LoggerService extends ConsoleLogger {
     this.logToFile(entry);
     super.log(message, context);
   }
-  error(message: string, trace: string, context?: string) {
+  error(message: string, context?: string) {
     const entry = `${context}\t${message}`;
     this.logToFile(entry);
     super.error(message, context);

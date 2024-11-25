@@ -14,45 +14,46 @@ datasource db {
 }
 
 model User {
-  id        String @id @default(uuid())
-  login     String
-  password  String
-  version   Int    @default(1)
-  createdAt Int    @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))
-  updatedAt Int    @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))
+  id       String @id @default(uuid())
+  login    String
+  password String
+
+  version   Int @default(1)
+  createdAt Int @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))
+  updatedAt Int @default(dbgenerated("(EXTRACT(EPOCH FROM now()) * 1000)::bigint"))
 }
 
 model Artist {
-  id         String   @id @default(uuid())
-  name       String   
-  grammy     Boolean
-  
+  id     String  @id @default(uuid())
+  name   String
+  grammy Boolean
+
   albums     Album[]
   tracks     Track[]
   isFavorite Boolean @default(false)
 }
 
 model Album {
-  id        String   @id @default(uuid())
-  name      String
-  year      Int
+  id   String @id @default(uuid())
+  name String
+  year Int
 
-  artist    Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
-  artistId  String?
+  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId String?
 
-  tracks    Track[]
-  isFavorite Boolean @default(false)  
+  tracks     Track[]
+  isFavorite Boolean @default(false)
 }
 
 model Track {
-  id        String   @id @default(uuid())
-  name      String
-  duration  Int
+  id       String @id @default(uuid())
+  name     String
+  duration Int
 
-  artist    Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
-  artistId  String?
-  album     Album?   @relation(fields: [albumId], references: [id], onDelete: SetNull)
-  albumId   String?
-  
-  isFavorite Boolean @default(false) 
+  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId String?
+  album    Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  albumId  String?
+
+  isFavorite Boolean @default(false)
 }
