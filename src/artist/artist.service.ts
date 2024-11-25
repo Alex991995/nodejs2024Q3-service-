@@ -9,13 +9,10 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as uuidValidate } from 'uuid';
-import { LoggerService } from 'src/logger/logger.service';
 
 @Injectable()
 export class ArtistService {
   constructor(private database: DatabaseService) {}
-
-  // private readonly logger = new LoggerService(ArtistService.name);
 
   async create(createArtistDto: CreateArtistDto) {
     const newArtist = { ...createArtistDto, id: uuidv4() };

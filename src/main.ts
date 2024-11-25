@@ -31,8 +31,8 @@ async function bootstrap() {
 
   console.log('Listening on port', PORT);
 
-  process.on('uncaughtException', (err) => {
-    logger.error(`[uncaughtException] ${err.message}`);
+  process.on('uncaughtException', (reason) => {
+    logger.error(`${reason.message} ${reason.stack}`);
   });
 
   process.on('unhandledRejection', (reason) => {

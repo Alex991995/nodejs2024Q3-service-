@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -10,15 +15,8 @@ import {
   TOKEN_EXPIRE_TIME,
   TOKEN_REFRESH_EXPIRE_TIME,
 } from './constants';
-
-// const SALT = +process.env.CRYPT_SALT;
-// const TOKEN_EXPIRE_TIME = process.env.TOKEN_EXPIRE_TIME;
-// const TOKEN_REFRESH_EXPIRE_TIME = process.env.TOKEN_REFRESH_EXPIRE_TIME;
-
-interface TokenPayload {
-  userId: string;
-  login: string;
-}
+import { RefreshTokenDto } from './dto/create-auth.dto';
+import { TokenPayload } from 'src/interface';
 
 @Injectable()
 export class AuthService {
@@ -61,9 +59,24 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  // refreshToken() {
+  async refreshToken(refreshTokenDto: RefreshTokenDto) {
+    const { refreshToken: token } = refreshTokenDto;
+    try {
+      const payload = await this.jwt.verifyAsync(token, {
+        secret: process.env.JWT_SECRET_KEY,
+      });
+      const accessToken = await this.jwt.signAsync(payload, {
+        expiresIn: TOKEN_EXPIRE_TIME,
+      });
 
-  // }
+      const refreshToken = await this.jwt.signAsync(payload, {
+        expiresIn: TOKEN_REFRESH_EXPIRE_TIME,
+      });
+      return { accessToken, refreshToken };
+    } catch (error) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+  }
 
   async shouldExistUser(login: string) {
     const foundUser = await this.database.user.findFirst({ where: { login } });
