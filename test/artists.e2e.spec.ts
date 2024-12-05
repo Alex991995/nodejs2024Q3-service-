@@ -99,7 +99,6 @@ describe('artist (e2e)', () => {
         .send(createArtistDto);
 
       const { id, name, grammy } = response.body;
-
       expect(response.status).toBe(StatusCodes.CREATED);
 
       expect(name).toBe(createArtistDto.name);
@@ -339,7 +338,6 @@ describe('artist (e2e)', () => {
       expect(searchAlbumResponse.statusCode).toBe(StatusCodes.OK);
 
       const { artistId: albumArtistId } = searchAlbumResponse.body;
-
       expect(albumArtistId).toBeNull();
     });
   });

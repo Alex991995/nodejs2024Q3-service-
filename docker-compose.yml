@@ -1,0 +1,45 @@
+services:
+  home-library:
+    image: alexwoods/home-library
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: 'postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${PORT_DB}/${POSTGRES_DB}?schema=public'
+    networks:
+      - app-network
+    restart: always
+    volumes:
+      - type: bind
+        source: ./src
+        target: /usr/src/app/src
+      - ./logs:/usr/src/app/logs
+    command: >
+      sh -c "mkdir -p /usr/src/app/logs && npm run start:dev"
+    env_file:
+      - .env
+  db:
+    container_name: db
+    build: ./databaseDocker/
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - ${PORT_DB}:${PORT_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+volumes:
+  pgdata: {}
+
+networks:
+  app-network:
+    name: app-network
+
+    # image: alexwoods/home-library
+  # container_name: home-library

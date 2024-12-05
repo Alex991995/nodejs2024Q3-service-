@@ -1,0 +1,16 @@
+node_modules
+README.md
+.prettierrc
+dist
+.env
+.dockerignore
+docker-compose.yml
+Dockerfile
+.git
+.gitignore
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+test
+jest.config.json
